@@ -1,6 +1,10 @@
 {
   "extends": "eslint-config-eyeo",
   "root": true,
+  "env": {
+    "browser": true,
+    "node": true
+  },
   "rules": {
     "no-labels": "off",
     "dot-location": ["error", "property"],

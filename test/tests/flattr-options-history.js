@@ -1,8 +1,7 @@
 "use strict";
 
 const requireInject = require("require-inject");
-const sinon = require("sinon");
-const chrome = require("sinon-chrome");
+const chrome = require("sinon-chrome/extensions");
 
 const {expect} = require("../assert");
 const {spawn} = require("../utils");
@@ -15,7 +14,7 @@ describe("Test Options History", () =>
 {
   it("Using <flattr-options-history> matches file name and lists links", () =>
   {
-    return spawn(function*()
+    return spawn(function* ()
     {
       const url = "http://foo.com/";
 
@@ -25,23 +24,20 @@ describe("Test Options History", () =>
       } = yield createEnvironment();
 
       chrome.runtime.sendMessage
-      .withArgs(
-        sinon.match({
+        .withArgs({
           type: "flattrs-get",
-          data: sinon.match.object
-        }),
-        sinon.match.func
-      )
-      .yields({
-        flattrs: [
-          {
-            url,
-            timestamps: [1, 3, 5],
-            entity: "foo.com",
-            title: "Foo"
-          }
-        ]
-      });
+          data: {}
+        })
+        .yields({
+          flattrs: [
+            {
+              url,
+              timestamps: [1, 3, 5],
+              entity: "foo.com",
+              title: "Foo"
+            }
+          ]
+        });
 
       requireInject(
         "../../src/lib/ui/components/" + TAG_NAME,
@@ -49,7 +45,7 @@ describe("Test Options History", () =>
           "global/window": window,
           "../../src/lib/common/env/chrome": {chrome},
           "../../src/lib/ui/components/virtual-element":
-          {h, v, register, VirtualElement}
+            {h, v, register, VirtualElement}
         }
       );
 

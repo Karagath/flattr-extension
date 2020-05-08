@@ -2,7 +2,6 @@
 
 const requireInject = require("require-inject");
 const chrome = require("sinon-chrome");
-const sinon = require("sinon");
 
 const {assert, expect} = require("../assert");
 
@@ -12,12 +11,9 @@ describe("Test lib/common/settings", () =>
 
   it("get setting", () =>
   {
-    chrome.storage.local.get.withArgs("1", sinon.match.func)
-    .yields({1: true});
-    chrome.storage.local.get.withArgs("2", sinon.match.func)
-    .yields({2: false});
-    chrome.storage.local.get.withArgs("3", sinon.match.func)
-    .yields({3: "bar"});
+    chrome.storage.local.get.withArgs("1").yields({1: true});
+    chrome.storage.local.get.withArgs("2").yields({2: false});
+    chrome.storage.local.get.withArgs("3").yields({3: "bar"});
 
     const {get} = requireInject("../../src/lib/common/settings", {
       "../../src/lib/common/env/chrome": {chrome}
@@ -33,8 +29,7 @@ describe("Test lib/common/settings", () =>
 
   it("get setting default", () =>
   {
-    chrome.storage.local.get.withArgs("1", sinon.match.func)
-    .yields({});
+    chrome.storage.local.get.withArgs("1").yields({});
 
     const {get} = requireInject("../../src/lib/common/settings", {
       "../../src/lib/common/env/chrome": {chrome}
@@ -81,10 +76,7 @@ describe("Test lib/common/settings", () =>
       {
         expect(newValue).to.equal("bar");
 
-        assert.calledWith(chrome.storage.local.set, sinon.match((data) =>
-        {
-          return data["foo"] === "bar";
-        }), sinon.match.func);
+        assert.ok(chrome.storage.local.set.withArgs({foo: "bar"}).calledOnce);
       });
   });
 
@@ -97,7 +89,7 @@ describe("Test lib/common/settings", () =>
         localStorage: {
           setItem(key, value)
           {
-            if (key == "foo")
+            if (key === "foo")
               settingValue = value;
           }
         }

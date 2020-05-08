@@ -1,6 +1,6 @@
 "use strict";
 
-const tld = require("tldjs");
+const {getPublicSuffix, tldExists} = require("tldjs");
 const {Blob, URL} = require("global/window");
 
 const {chrome} = require("./env/chrome");
@@ -17,11 +17,12 @@ exports.createURLFromData = (data) =>
 
 function getCurrentWindowId()
 {
-  return new Promise((resolve, reject) =>
+  return new Promise((resolve) =>
   {
     chrome.windows.getLastFocused((win) => resolve(win.id));
   });
 }
+
 exports.getCurrentWindowId = getCurrentWindowId;
 
 function getCurrentTab()
@@ -30,36 +31,36 @@ function getCurrentTab()
   {
     chrome.tabs.query({active: true, lastFocusedWindow: true}, ([tab]) =>
     {
-      try
+      if (!tab || tab.incognito)
       {
-        if (!tab || tab.incognito)
-          throw new ReferenceError("Current tab not found");
+        reject(ReferenceError("Current tab not found"));
+      }
 
-        let url = normalizeURL(tab.url);
-        resolve({
-          id: tab.id,
-          title: tab.title,
-          url
-        });
-      }
-      catch (ex)
-      {
-        reject(ex);
-      }
+      let url = normalizeURL(tab.url);
+      resolve({
+        id: tab.id,
+        title: tab.title,
+        url
+      });
     });
   });
 }
+
 exports.getCurrentTab = getCurrentTab;
 
 function normalizeURL(url)
 {
   url = new URL(url);
   if (!/^https?:$/.test(url.protocol))
+  {
     throw new URIError("URL has invalid protocol");
+  }
 
-  let suffix = tld.getPublicSuffix(url.hostname);
-  if (!suffix || suffix == url.hostname)
+  const suffix = getPublicSuffix(url.hostname);
+  if (!tldExists(url.hostname) || suffix === url.hostname)
+  {
     throw new URIError("URL has invalid domain name");
+  }
 
   url.password = "";
   url.username = "";
@@ -69,13 +70,13 @@ function normalizeURL(url)
   // so we can get rid of the other query string parameters
   let params = url.search;
   url.search = "";
-  if (url.hostname == "www.youtube.com" && url.pathname == "/watch")
+  if (url.hostname === "www.youtube.com" && url.pathname === "/watch")
   {
     params = params.substr(1).split("&");
     for (let param of params)
     {
       let [key] = param.split("=", 1);
-      if (key == "v")
+      if (key === "v")
       {
         url.search = param;
         break;
@@ -85,4 +86,5 @@ function normalizeURL(url)
 
   return url.toString();
 }
+
 exports.normalizeURL = normalizeURL;

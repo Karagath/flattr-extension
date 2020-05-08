@@ -5,7 +5,7 @@
 "use strict";
 
 const {location} = require("global/window");
-const {API_BASE_DOMAIN} = require('../common/constants')
+const {API_BASE_DOMAIN} = require("../common/constants");
 const {chrome} = require("../common/env/chrome");
 const {normalizeURL} = require("../common/utils");
 

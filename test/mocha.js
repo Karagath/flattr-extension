@@ -2,9 +2,8 @@
 
 const fs = require("fs");
 const path = require("path");
-const parseArgs = require("minimist");
 const Mocha = require("mocha");
-
+const packageJson = require("../package.json");
 const {getArgs} = require("../build/cli");
 
 const testsDir = path.join(__dirname, "tests");
@@ -19,8 +18,7 @@ let reIncluded = new RegExp(args.include);
 
 function getMochaOpts()
 {
-  let opts = fs.readFileSync(path.join(__dirname, "mocha.opts"), "utf8");
-  return parseArgs(opts.trim().split(/\s/));
+  return packageJson.mocha;
 }
 
 function run()

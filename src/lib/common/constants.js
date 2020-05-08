@@ -1,13 +1,17 @@
 "use strict";
 
-let apiDomain = 'flattr.com'
-let apiProtocol = 'https'
-if ("__BUILD_TYPE__" === 'staging') {
-  apiDomain = 'smickr.net'
+let apiDomain = "flattr.com";
+let apiProtocol = "https";
+// eslint-disable-next-line no-constant-condition
+if ("__BUILD_TYPE__" === "staging")
+{
+  apiDomain = "smickr.net";
 }
-if ("__BUILD_TYPE__" === 'development') {
-  apiDomain = 'flattr.test'
-  apiProtocol = 'http'
+// eslint-disable-next-line no-constant-condition
+if ("__BUILD_TYPE__" === "development")
+{
+  apiDomain = "flattr.test";
+  apiProtocol = "http";
 }
 
 /**
