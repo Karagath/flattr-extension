@@ -36,7 +36,16 @@ function getCurrentTab()
         reject(ReferenceError("Current tab not found"));
       }
 
-      let url = normalizeURL(tab.url);
+      let url;
+      try
+      {
+        url = normalizeURL(tab.url);
+      }
+      catch (e)
+      {
+        reject(e);
+      }
+
       resolve({
         id: tab.id,
         title: tab.title,
